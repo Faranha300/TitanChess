@@ -5,7 +5,7 @@ import utils.matrix_transformations as mt
 import sprite_mananger.sprite_mananger as sm
 
 clock = pg.time.Clock()
-display = pg.display.set_mode(constants.WINDOW_SIZE, pg.RESIZABLE, 32)
+display = pg.display.set_mode(constants.WINDOW_SIZE, 0, 32)
 #display = pg.Surface((300, 200))
 
 tile_sheet_image = pg.image.load('./resources/atlas/iso_tileset1.png')
@@ -22,8 +22,11 @@ def app():
 
         for event in pg.event.get():
             if event == pg.QUIT:
+                pg.display.quit()
                 pg.quit()
                 sys.exit()
+                run = False
+            
 
         for row in range(8):
             for col in range(8):

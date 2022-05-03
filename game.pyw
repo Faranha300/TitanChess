@@ -55,7 +55,10 @@ class coletaveis(object):
     def vida():
         vida += 1
 
-item_vermelho = coletaveis((200,0,0), 10, random.randrange(750,1300), random.randint(500,700))
+cords_item_vermelho = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+item_vermelho = coletaveis((200,0,0), 10, cords_item_vermelho[0], cords_item_vermelho[1])
+
+item_vermelho_coletado = False
 
 #MAIN LOOP
 
@@ -96,12 +99,20 @@ while run:
     if keys[pg.K_DOWN] and Dama.posicao_y <= 735:
         Dama.posicao_y += Dama.velocidade
 
-    #print(Dama.posicao_x, Dama.posicao_y)
+#IDENTIFICAÇÃO DE COLISÃO COM O ITEM
     distanciaPlayerObjeto=calcularDistanciaPontos(Dama.posicao_x, item_vermelho.posicao_coletavel_x, Dama.posicao_y, item_vermelho.posicao_coletavel_y)
-    if distanciaPlayerObjeto<=30:
-        item_vermelho.color=(255,255,255)
-        Dama.velocidade=10
-    #print(calcularDistanciaPontos(0,0,3,4))
+    if distanciaPlayerObjeto<=20:
+        if Dama.velocidade<20:
+            Dama.velocidade+=5
+        item_vermelho_coletado = True
+#MUDANÇA DE LUGAR DO ITEM
+    if item_vermelho_coletado == True:
+        cords_item_vermelho = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+        item_vermelho = coletaveis((200,0,0), 10, cords_item_vermelho[0], cords_item_vermelho[1])
+        item_vermelho_coletado = False
+        
+#VERIFICANDO A VELOCIDADE
+        
 
     
 

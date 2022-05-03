@@ -1,3 +1,4 @@
+from numpy import disp
 import pygame as pg 
 import sys 
 import utils.constants as constants
@@ -5,6 +6,7 @@ import utils.matrix_transformations as mt
 import sprite_mananger.sprite_mananger as sm
 
 clock = pg.time.Clock()
+
 display = pg.display.set_mode(constants.WINDOW_SIZE, pg.RESIZABLE, 32)
 #display = pg.Surface((300, 200))
 
@@ -14,8 +16,11 @@ tile_sheet = sm.SpriteManganger(tile_sheet_image)
 block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 
 block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
-
-def app():
+teste = mt.mudanca_base(1, 1, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+bloco_teste = pg.draw.rect(display, (45, 123, 19), (teste[0], teste[1], 50, 50))
+x = 0
+y = 0
+def app(x, y):
     run = True
     while run:
         display.fill((146, 244, 255))
@@ -33,9 +38,36 @@ def app():
                 else:
                     display.blit(block_black_floor, block_coords)
 
+        keys = pg.key.get_pressed()
+
+        #teste = mt.mudanca_base(x, y, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+
+        # if keys[pg.K_LEFT]:
+        #     x -= 1
+        # if keys[pg.K_RIGHT]:
+        #     x += 1
+        # if keys[pg.K_UP]:
+        #     y -= 1
+        # if keys[pg.K_DOWN]:
+        #     y += 1
+
+        for event in pg.event.get():
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_LEFT:
+                    x -= 1
+                if event.key == pg.K_RIGHT:
+                    x += 1
+                if event.key == pg.K_UP:
+                    y -= 1
+                if event.key == pg.K_DOWN:
+                    y += 1
+
+        teste = mt.mudanca_base(x, y, constants.FLOOR_SIZE*4 , constants.MATRIZ_MUDA_BASE)
+        bloco_teste = pg.draw.rect(display, (45, 123, 19), (teste[0]-8, teste[1]-8, 16, 16))
+        #print(x, y, teste)
         pg.display.update()
         clock.tick(60)
 
-app()
+app(x, y)
         
 

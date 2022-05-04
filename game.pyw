@@ -58,6 +58,20 @@ class coletaveis(object):
     def Dano():
         Dano += 1
 
+#projetil_temp
+#PROJÉTIL 
+
+class projetil(object):
+    def __init__(self):
+        self.color = (238,173,14)
+        self.tamanho = 10
+        self.posicao_projetil_x = 0
+        self.posicao_projetil_y = 0
+        self.hitbox = (self.posicao_projetil_x, self.posicao_projetil_y, self.tamanho)
+
+#
+#
+
 cords_item_Verde = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
 
 item_Verde = coletaveis((61,145,64), 10, cords_item_Verde[0], cords_item_Verde[1])
@@ -66,6 +80,9 @@ cords_item_roxo = mt.mudanca_base(random.randint(1,8), random.randint(0,7), cons
 
 item_Roxo = coletaveis((138,43,226), 10, cords_item_roxo[0], cords_item_roxo[1])
 
+#
+
+projetil = projetil()
 
 item_Verde_coletado = False
 
@@ -103,7 +120,7 @@ while run:
     
     if keys[pg.K_LEFT] and Dama.posicao_x >= 490:
         Dama.posicao_x -= Dama.velocidade
-    if keys[pg.K_RIGHT] and Dama.posicao_x <= 1440:
+    if keys[pg.K_RIGHT] and Dama.posicao_x <= 1440: 
         Dama.posicao_x += Dama.velocidade
     if keys[pg.K_UP] and Dama.posicao_y >= 275:
         Dama.posicao_y -= Dama.velocidade
@@ -137,6 +154,13 @@ while run:
 #COOLDOWN DE SPAWN DE ITENS
     if static_timer:
         last_item_time = pg.time.get_ticks() - static_timer
+    #
+    #projetil_temp
+    projetil.posicao_projetil_x = Dama.posicao_x
+    projetil.posicao_projetil_y = Dama.posicao_y-20
+    
+    pg.draw.circle(display, projetil.color, (projetil.posicao_projetil_x, projetil.posicao_projetil_y), projetil.tamanho)
+    #
     pg.display.update()
     clock.tick(60)
 

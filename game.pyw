@@ -8,8 +8,6 @@ import random
 
 clock = pg.time.Clock()
 display = pg.display.set_mode(constants.WINDOW_SIZE, 0, 32)
-#display = pg.Surface((300, 200))
-
 
 tile_sheet_image = pg.image.load('./resources/atlas/iso_tileset1.png')
 tile_sheet = sm.SpriteManganger(tile_sheet_image)
@@ -20,7 +18,11 @@ block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOO
 
 def calcularDistanciaPontos(xA,xB,yA,yB):
     return (((xB-xA)**2)+((yB-yA)**2))**(1/2)
-    
+
+#CONTADORES DE TEMPO SPAWN ITENS
+static_timer = None
+last_item_time = None
+
 #PLAYER
 
 velocidade = 5
@@ -42,6 +44,7 @@ Dama = player(950,500)
               
 
 #coletáveis
+
 class coletaveis(object):
     def __init__(self, color, tamanho, posicao_coletavel_x, posicao_coletavel_y) -> None:
         self.color = color
@@ -52,11 +55,17 @@ class coletaveis(object):
     
     def mais_velocidade():
         velocidade += 3
-    def vida():
-        vida += 1
+    def Dano():
+        Dano += 1
 
 cords_item_vermelho = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+
 item_vermelho = coletaveis((200,0,0), 10, cords_item_vermelho[0], cords_item_vermelho[1])
+
+cords_item_roxo = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+
+item_Roxo = coletaveis((138,43,226), 10, cords_item_roxo[0], cords_item_roxo[1])
+
 
 item_vermelho_coletado = False
 
@@ -84,6 +93,8 @@ while run:
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
     pg.draw.circle(display, item_vermelho.color, (item_vermelho.posicao_coletavel_x, item_vermelho.posicao_coletavel_y), item_vermelho.tamanho )
+    pg.draw.circle(display, item_Roxo.color, (item_Roxo.posicao_coletavel_x, item_Roxo.posicao_coletavel_y), item_Roxo.tamanho )
+
     
 #DESENHO DO PLAYER E MOVIMENTAÇÂO COM OOP
  
@@ -99,23 +110,33 @@ while run:
     if keys[pg.K_DOWN] and Dama.posicao_y <= 735:
         Dama.posicao_y += Dama.velocidade
 
+#MUDANÇA DE LUGAR DO ITEM / IDENTIFICAÇÃO SE ITEM FOI COLETADO
+    if item_vermelho_coletado == True:
+        if last_item_time>3000:
+            cords_item_vermelho = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+            item_vermelho = coletaveis((200,0,0), 10, cords_item_vermelho[0], cords_item_vermelho[1])
+            item_vermelho_coletado = False
+
+            
 #IDENTIFICAÇÃO DE COLISÃO COM O ITEM
+        
     distanciaPlayerObjeto=calcularDistanciaPontos(Dama.posicao_x, item_vermelho.posicao_coletavel_x, Dama.posicao_y, item_vermelho.posicao_coletavel_y)
     if distanciaPlayerObjeto<=20:
-        if Dama.velocidade<20:
-            Dama.velocidade+=5
+        if Dama.velocidade<12:
+            Dama.velocidade+=3
+
+        item_vermelho.posicao_coletavel_x = 0
+        item_vermelho.posicao_coletavel_y = 0
+        item_vermelho.color = (146, 244, 255)
+        item_vermelho.tamanho = 0
+        static_timer = pg.time.get_ticks()
+
         item_vermelho_coletado = True
-#MUDANÇA DE LUGAR DO ITEM
-    if item_vermelho_coletado == True:
-        cords_item_vermelho = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
-        item_vermelho = coletaveis((200,0,0), 10, cords_item_vermelho[0], cords_item_vermelho[1])
-        item_vermelho_coletado = False
-        
-#VERIFICANDO A VELOCIDADE
-        
 
-    
-
+        
+#COOLDOWN DE SPAWN DE ITENS
+    if static_timer:
+        last_item_time = pg.time.get_ticks() - static_timer
     pg.display.update()
     clock.tick(60)
 

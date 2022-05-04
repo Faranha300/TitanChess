@@ -34,7 +34,13 @@ class player(object):
         self.velocidade = 5
         self.raio = 20
         self.cor = (0,0,123)
+        self.ammo = 1
         self.hitbox = (self.posicao_x, self.posicao_y, self.raio)
+
+        self.cima = True
+        self.direita = False
+        self.esquerda = False
+        self.baixo = False
         
         pg.draw.circle(display, self.cor, (self.posicao_x,self.posicao_y), self.raio)
         pg.display.update()
@@ -67,6 +73,8 @@ class projetil(object):
         self.tamanho = 10
         self.posicao_projetil_x = 0
         self.posicao_projetil_y = 0
+        self.range = 300
+        self.destino = None
         self.hitbox = (self.posicao_projetil_x, self.posicao_projetil_y, self.tamanho)
 
 #
@@ -120,12 +128,53 @@ while run:
     
     if keys[pg.K_LEFT] and Dama.posicao_x >= 490:
         Dama.posicao_x -= Dama.velocidade
+        
+        Dama.esquerda = True
+        Dama.cima = False
+        Dama.direita = False
+        Dama.baixo = False
+        
     if keys[pg.K_RIGHT] and Dama.posicao_x <= 1440: 
         Dama.posicao_x += Dama.velocidade
+
+        Dama.direita = True
+        Dama.cima = False
+        Dama.esquerda = False
+        Dama.baixo = False
+        
     if keys[pg.K_UP] and Dama.posicao_y >= 275:
         Dama.posicao_y -= Dama.velocidade
+
+        Dama.cima = True
+        Dama.direita = False
+        Dama.esquerda = False
+        Dama.baixo = False
+        
     if keys[pg.K_DOWN] and Dama.posicao_y <= 735:
         Dama.posicao_y += Dama.velocidade
+
+        Dama.baixo = True
+        Dama.cima = False
+        Dama.direita = False
+        Dama.esquerda = False
+
+    #projetil_temp
+
+    if keys[pg.K_SPACE] and Dama.posicao_y <= 735:
+        if Dama.ammo>0:
+            if Dama.cima == True:
+                projetil.destino = [Dama.posicao_x, Dama.posicao_y-projetil.range]
+            if Dama.direita == True:
+                projetil.destino = [Dama.posicao_x+projetil.range, Dama.posicao_y]
+            if Dama.esquerda == True:
+                projetil.destino = [Dama.posicao_x-projetil.range, Dama.posicao_y]
+            if Dama.baixo == True:
+                projetil.destino = [Dama.posicao_x, Dama.posicao_y+projetil.range]
+    if keys[pg.K_z]:
+        Dama.ammo = 1
+        projetil.destino = None
+        #
+            
 
 #MUDANÇA DE LUGAR DO ITEM / IDENTIFICAÇÃO SE ITEM FOI COLETADO
     if item_Verde_coletado == True:
@@ -154,10 +203,60 @@ while run:
 #COOLDOWN DE SPAWN DE ITENS
     if static_timer:
         last_item_time = pg.time.get_ticks() - static_timer
-    #
     #projetil_temp
-    projetil.posicao_projetil_x = Dama.posicao_x
-    projetil.posicao_projetil_y = Dama.posicao_y-20
+    if Dama.ammo>0:
+        if Dama.cima:
+            projetil.posicao_projetil_x = Dama.posicao_x
+            projetil.posicao_projetil_y = Dama.posicao_y-20
+            
+        elif Dama.direita:
+            projetil.posicao_projetil_x = Dama.posicao_x+20
+            projetil.posicao_projetil_y = Dama.posicao_y
+            
+        elif Dama.esquerda:
+            projetil.posicao_projetil_x = Dama.posicao_x-20
+            projetil.posicao_projetil_y = Dama.posicao_y
+            
+        elif Dama.baixo:
+            projetil.posicao_projetil_x = Dama.posicao_x
+            projetil.posicao_projetil_y = Dama.posicao_y+20
+            
+    if projetil.destino != None:
+        if not projetil.destino==(projetil.posicao_projetil_x, projetil.posicao_projetil_y):
+            Dama.ammo = 0
+            #
+            if projetil.destino[0]>projetil.posicao_projetil_x:
+                if (projetil.destino[0] - projetil.posicao_projetil_x)<5:
+                    
+                    projetil.posicao_projetil_x = projetil.destino[0]
+                else:
+                    projetil.posicao_projetil_x += 5
+                    
+            if projetil.destino[0]<projetil.posicao_projetil_x:
+                if (projetil.posicao_projetil_x - projetil.destino[0])<5:
+                    
+                    projetil.posicao_projetil_x = projetil.destino[0]
+                else:
+                    projetil.posicao_projetil_x -= 5
+            #
+            if projetil.destino[1]>projetil.posicao_projetil_y:
+                if (projetil.destino[1] - projetil.posicao_projetil_y)<5:
+                    
+                    projetil.posicao_projetil_y = projetil.destino[1]
+                else:
+                    projetil.posicao_projetil_y += 5
+                    
+            if projetil.destino[1]<projetil.posicao_projetil_y:
+                if (projetil.posicao_projetil_y - projetil.destino[1])<5:
+                    
+                    projetil.posicao_projetil_y = projetil.destino[1]
+                else:
+                    projetil.posicao_projetil_y -= 5
+
+    
+
+
+        
     
     pg.draw.circle(display, projetil.color, (projetil.posicao_projetil_x, projetil.posicao_projetil_y), projetil.tamanho)
     #

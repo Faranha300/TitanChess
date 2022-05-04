@@ -58,16 +58,16 @@ class coletaveis(object):
     def Dano():
         Dano += 1
 
-cords_item_vermelho = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+cords_item_Verde = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
 
-item_vermelho = coletaveis((200,0,0), 10, cords_item_vermelho[0], cords_item_vermelho[1])
+item_Verde = coletaveis((61,145,64), 10, cords_item_Verde[0], cords_item_Verde[1])
 
 cords_item_roxo = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
 
 item_Roxo = coletaveis((138,43,226), 10, cords_item_roxo[0], cords_item_roxo[1])
 
 
-item_vermelho_coletado = False
+item_Verde_coletado = False
 
 #MAIN LOOP
 
@@ -92,7 +92,7 @@ while run:
                 display.blit(block_black_floor, block_coords)
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
-    pg.draw.circle(display, item_vermelho.color, (item_vermelho.posicao_coletavel_x, item_vermelho.posicao_coletavel_y), item_vermelho.tamanho )
+    pg.draw.circle(display, item_Verde.color, (item_Verde.posicao_coletavel_x, item_Verde.posicao_coletavel_y), item_Verde.tamanho )
     pg.draw.circle(display, item_Roxo.color, (item_Roxo.posicao_coletavel_x, item_Roxo.posicao_coletavel_y), item_Roxo.tamanho )
 
     
@@ -111,27 +111,27 @@ while run:
         Dama.posicao_y += Dama.velocidade
 
 #MUDANÇA DE LUGAR DO ITEM / IDENTIFICAÇÃO SE ITEM FOI COLETADO
-    if item_vermelho_coletado == True:
+    if item_Verde_coletado == True:
         if last_item_time>3000:
-            cords_item_vermelho = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
-            item_vermelho = coletaveis((200,0,0), 10, cords_item_vermelho[0], cords_item_vermelho[1])
-            item_vermelho_coletado = False
+            cords_item_Verde = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
+            item_Verde = coletaveis((61,145,64), 10, cords_item_Verde[0], cords_item_Verde[1])
+            item_Verde_coletado = False
 
             
 #IDENTIFICAÇÃO DE COLISÃO COM O ITEM
         
-    distanciaPlayerObjeto=calcularDistanciaPontos(Dama.posicao_x, item_vermelho.posicao_coletavel_x, Dama.posicao_y, item_vermelho.posicao_coletavel_y)
+    distanciaPlayerObjeto=calcularDistanciaPontos(Dama.posicao_x, item_Verde.posicao_coletavel_x, Dama.posicao_y, item_Verde.posicao_coletavel_y)
     if distanciaPlayerObjeto<=20:
         if Dama.velocidade<12:
             Dama.velocidade+=3
 
-        item_vermelho.posicao_coletavel_x = 0
-        item_vermelho.posicao_coletavel_y = 0
-        item_vermelho.color = (146, 244, 255)
-        item_vermelho.tamanho = 0
+        item_Verde.posicao_coletavel_x = 0
+        item_Verde.posicao_coletavel_y = 0
+        item_Verde.color = (146, 244, 255)
+        item_Verde.tamanho = 0
         static_timer = pg.time.get_ticks()
 
-        item_vermelho_coletado = True
+        item_Verde_coletado = True
 
         
 #COOLDOWN DE SPAWN DE ITENS

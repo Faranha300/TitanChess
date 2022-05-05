@@ -15,6 +15,7 @@ block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOO
 
 block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 
+
 def calcularDistanciaPontos(xA,xB,yA,yB):
     return (((xB-xA)**2)+((yB-yA)**2))**(1/2)
 
@@ -156,7 +157,7 @@ class Sombra(object):
 
     def desenhar(self):
         if torre.is_jump:
-            pg.draw.circle(display, (250, 250, 250), (self.posicao_X, self.posicao_Y,), self.raio)
+            pg.draw.circle(display, (54,54,54), (self.posicao_X, self.posicao_Y,), self.raio)
 
 Dama = Player(1200,500)
 torre = Torre(constants.WINDOW_SIZE[0] // 2, constants.WINDOW_SIZE[1] // 2) 
@@ -190,11 +191,17 @@ cords_item_Verde = mt.mudanca_base(random.randint(1,8), random.randint(0,7), con
 item_Verde = coletaveis((61,145,64), 10, cords_item_Verde[0], cords_item_Verde[1])
 
 cords_item_vida_drop = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
-Vida_item = coletaveis((255,0,226), 0, cords_item_vida_drop[0], cords_item_vida_drop[1])
+Vida_item = coletaveis((255,0,226), 10, cords_item_vida_drop[0], cords_item_vida_drop[1])
+
+posicao_da_bala_chao = [0,0]
+arma_no_chao = coletaveis((238,173,14), 10, posicao_da_bala_chao[0], posicao_da_bala_chao[1])
+
 
 item_Verde_coletado = False
 
 item_vida_coletada = False
+
+arma_no_chao_item = False
 
 #ARRUMAR ESSA PARTE
 Game_over = False
@@ -223,7 +230,7 @@ while run:
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
     pg.draw.circle(display, item_Verde.color, (item_Verde.posicao_coletavel_x, item_Verde.posicao_coletavel_y), item_Verde.tamanho )
-    pg.draw.circle(display, Vida_item.color, (Vida_item.posicao_coletavel_x, Vida_item.posicao_coletavel_y), item_Verde.tamanho)
+    pg.draw.circle(display, Vida_item.color, (Vida_item.posicao_coletavel_x, Vida_item.posicao_coletavel_y), Vida_item.tamanho)
 
     
 #DESENHO DO PLAYER E MOVIMENTAÇÂO COM OOP
@@ -237,18 +244,22 @@ while run:
     keys = pg.key.get_pressed()
 
     if keys[pg.K_SPACE] and Dama.posicao_y <= 735:
-        if Dama.ammo>0:
+        if Dama.ammo > 0:
             if Dama.cima == True:
                 projetil.destino = [Dama.posicao_x, Dama.posicao_y-projetil.range]
+                posicao_da_bala_chao = projetil.destino
+                
             if Dama.direita == True:
                 projetil.destino = [Dama.posicao_x+projetil.range, Dama.posicao_y]
+                posicao_da_bala_chao = projetil.destino
+
             if Dama.esquerda == True:
                 projetil.destino = [Dama.posicao_x-projetil.range, Dama.posicao_y]
+                posicao_da_bala_chao = projetil.destino
+
             if Dama.baixo == True:
                 projetil.destino = [Dama.posicao_x, Dama.posicao_y+projetil.range]
-    if keys[pg.K_z]:
-        Dama.ammo = 1
-        projetil.destino = None
+                posicao_da_bala_chao = projetil.destino
         
 
 #DESENHO DO BOOS E MOVIMENTAÇÃO COM OOP 
@@ -273,10 +284,9 @@ while run:
         if not torre.is_jump: #Para ele não bater no player em cima no meio do pulo
             if calcularDistanciaPontos(Dama.posicao_x, torre.bossX, Dama.posicao_y, torre.bossY) <= 40:
                 Dama.vida -= 1
+ 
  #FALTA COLOCAR UM TIMER AQUI PRO CARA N TOMAR INSTAKILL
-                Dama.vida = 3
                 
-                print(Dama.vida)
                 if Dama.vida == 0:
                     while True:
                         display.blit(game_over_img,(0,0))
@@ -288,8 +298,7 @@ while run:
     
     if item_Verde_coletado:
         
-        if last_item_time>3000:
-            
+        if last_item_time > 3000:          
             cords_item_Verde = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
             item_Verde = coletaveis((61,145,64), 10, cords_item_Verde[0], cords_item_Verde[1])
             item_Verde_coletado = False
@@ -310,8 +319,7 @@ while run:
         
     distanciaPlayerObjeto = calcularDistanciaPontos(Dama.posicao_x, item_Verde.posicao_coletavel_x, Dama.posicao_y, item_Verde.posicao_coletavel_y)
     
-    if distanciaPlayerObjeto <= 20:
-        
+    if distanciaPlayerObjeto <= 20:       
        
         Dama.velocidade += 2
         Dama.cor = (0,238,238)           
@@ -335,6 +343,13 @@ while run:
         static_timer = pg.time.get_ticks()
     
         item_vida_coletada = True
+    
+    distacia_da_bala_chao = calcularDistanciaPontos(Dama.posicao_x, posicao_da_bala_chao[0], Dama.posicao_y, posicao_da_bala_chao[1])
+
+    if distacia_da_bala_chao <= 20:
+        Dama.ammo = 1
+        projetil.destino = None
+
 
     if static_timer:
         last_item_time = pg.time.get_ticks() - static_timer
@@ -391,7 +406,6 @@ while run:
                     projetil.posicao_projetil_y -= 5
     pg.draw.circle(display, projetil.color, (projetil.posicao_projetil_x, projetil.posicao_projetil_y), projetil.tamanho)
    
-    print(Dama.vida)
     pg.display.update()
     clock.tick(60)
     

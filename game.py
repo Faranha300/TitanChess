@@ -310,7 +310,7 @@ while run:
         if last_item_time > 30000:
 
             cords_item_vida_drop = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
-            Vida_item = coletaveis((255,0,226), 0, cords_item_vida_drop[0], cords_item_vida_drop[1])
+            Vida_item = coletaveis((255,0,226), 10, cords_item_vida_drop[0], cords_item_vida_drop[1])
             item_vida_coletada = False
             
 
@@ -374,7 +374,7 @@ while run:
             projetil.posicao_projetil_y = Dama.posicao_y+20
             
     if projetil.destino != None:
-        if not projetil.destino==(projetil.posicao_projetil_x, projetil.posicao_projetil_y):
+        if not projetil.destino == (projetil.posicao_projetil_x, projetil.posicao_projetil_y):
             Dama.ammo = 0
             #
             if projetil.destino[0]>projetil.posicao_projetil_x:

@@ -185,6 +185,7 @@ class projetil(object):
         self.posicao_projetil_y = 0
         self.range = 300
         self.destino = None
+        self.movimentando = False
         self.hitbox = (self.posicao_projetil_x, self.posicao_projetil_y, self.tamanho)
 
 projetil = projetil()
@@ -258,19 +259,19 @@ while run:
     if keys[pg.K_SPACE] and Dama.posicao_y <= 735:
         if Dama.ammo > 0:
             if Dama.cima == True:
-                projetil.destino = [Dama.posicao_x, Dama.posicao_y-projetil.range]
+                projetil.destino = (Dama.posicao_x, Dama.posicao_y-projetil.range)
                 posicao_da_bala_chao = projetil.destino
                 
             if Dama.direita == True:
-                projetil.destino = [Dama.posicao_x+projetil.range, Dama.posicao_y]
+                projetil.destino = (Dama.posicao_x+projetil.range, Dama.posicao_y)
                 posicao_da_bala_chao = projetil.destino
 
             if Dama.esquerda == True:
-                projetil.destino = [Dama.posicao_x-projetil.range, Dama.posicao_y]
+                projetil.destino = (Dama.posicao_x-projetil.range, Dama.posicao_y)
                 posicao_da_bala_chao = projetil.destino
 
             if Dama.baixo == True:
-                projetil.destino = [Dama.posicao_x, Dama.posicao_y+projetil.range]
+                projetil.destino = (Dama.posicao_x, Dama.posicao_y+projetil.range)
                 posicao_da_bala_chao = projetil.destino
         
 #BLOCO DE VERIFICAÇÃO SE O TEMPO DA IMUNIDADE DO PLAYER JÁ PASSOU
@@ -382,7 +383,6 @@ while run:
         last_item_time = pg.time.get_ticks() - static_timer
 
 #MOVIMENTAÇÃO DO PROJÉTIL
-   
     if Dama.ammo > 0:
         if Dama.cima:
             projetil.posicao_projetil_x = Dama.posicao_x
@@ -399,15 +399,19 @@ while run:
         elif Dama.baixo:
             projetil.posicao_projetil_x = Dama.posicao_x
             projetil.posicao_projetil_y = Dama.posicao_y+20
+
+#
             
     if projetil.destino != None:
-        if not projetil.destino==(projetil.posicao_projetil_x, projetil.posicao_projetil_y):
+        if not projetil.destino == (projetil.posicao_projetil_x, projetil.posicao_projetil_y):
+            projetil.movimentando = True
             Dama.ammo = 0
             #
             if projetil.destino[0]>projetil.posicao_projetil_x:
                 if (projetil.destino[0] - projetil.posicao_projetil_x)<5:
                     
                     projetil.posicao_projetil_x = projetil.destino[0]
+                    
                 else:
                     projetil.posicao_projetil_x += 5
                     
@@ -415,6 +419,7 @@ while run:
                 if (projetil.posicao_projetil_x - projetil.destino[0])<5:
                     
                     projetil.posicao_projetil_x = projetil.destino[0]
+                    
                 else:
                     projetil.posicao_projetil_x -= 5
             #
@@ -422,6 +427,7 @@ while run:
                 if (projetil.destino[1] - projetil.posicao_projetil_y)<5:
                     
                     projetil.posicao_projetil_y = projetil.destino[1]
+                    
                 else:
                     projetil.posicao_projetil_y += 5
                     
@@ -429,8 +435,18 @@ while run:
                 if (projetil.posicao_projetil_y - projetil.destino[1])<5:
                     
                     projetil.posicao_projetil_y = projetil.destino[1]
+                    
                 else:
                     projetil.posicao_projetil_y -= 5
+                    
+        else:
+            projetil.destino = None #Caso tenha chegado no destino, volta a ser destino = None
+    else:
+        projetil.movimentando = False #Já que o destino virou None no tick passado, ele deixa de estar em movimento
+
+    #print(projetil.movimentando)
+
+    
     pg.draw.circle(display, projetil.color, (projetil.posicao_projetil_x, projetil.posicao_projetil_y), projetil.tamanho)
 
     

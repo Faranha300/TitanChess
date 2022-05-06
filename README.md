@@ -1,2 +1,2 @@
 # projeto-ip-cc
-Projeto da disciplina de introdução a progamação do curco de ciencia da computação no CIn-UFPE
+Projeto da disciplina de Introdução a Progamação do curso de Ciência da Computação no CIn-UFPE

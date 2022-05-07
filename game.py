@@ -1,3 +1,4 @@
+from pydoc import visiblename
 import pygame as pg 
 import sys 
 import utils.constants as constants
@@ -15,6 +16,10 @@ block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOO
 
 block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 
+#CORES USADAS:
+AzulMarinho = (0,0,123) #Player
+AzulClaroFosco = (153,153,255) #Imunidade
+Ciano = (0,238,238)  #Velocidade
 
 def calcularDistanciaPontos(xA,xB,yA,yB):
     return (((xB-xA)**2)+((yB-yA)**2))**(1/2)
@@ -24,7 +29,14 @@ def calcularDistanciaPontos(xA,xB,yA,yB):
 static_timer = None
 last_item_time = None
 
+#CONTADORES DE TEMPO DE DANO AO PLAYER
+static_timer_player = None
+last_hit_time = None
+
+tempo_imune = 3000 #milisegundos
+
 #PLAYER
+hits = 0
 
 class Player(object):
     def __init__(self, posicao_x, posicao_y) -> None:
@@ -36,6 +48,7 @@ class Player(object):
         self.hitbox = (self.posicao_x, self.posicao_y, self.raio)
         self.ammo = 1
         self.vida = 1
+        self.imune = False
 
         self.cima = True
         self.direita = False
@@ -104,12 +117,32 @@ class Boss(object):
         self.velI = 32
         self.raio = 20
         self.cor = (255,0,0)
-        self.vida = 100
         self.walkCount = 2
         self.jump_count = 10
         self.is_jump = True
         self.largura = 0
         self.altura = 0
+        self.vida = 400
+        self.tamanho_da_barra_vida = 400
+
+
+    def atualizar(self):
+        self.barra_De_vida()
+        self.vida_animacao()
+
+    def tomar_dano(self,dano_do_player):
+        if self.vida > 0:
+            self.vida -= dano_do_player       
+        if self.vida <= 0:
+            self.vida = 0
+
+    def barra_De_vida(self):
+        pg.draw.rect(display, (255, 0, 0), (1300, 110, self.vida, 15))
+        pg.draw.rect(display, (0,255,0), (1300,110, self.vida, 15))
+        pg.draw.rect(display, (0,0,0), (1300, 110, self.tamanho_da_barra_vida, 15),4)
+
+            
+
 
 #Clase específica, recebe os parâmetros do boss, mas prioriza o que for dado dentro dela
 
@@ -169,13 +202,15 @@ class projetil(object):
     def __init__(self):
         self.color = (238,173,14)
         self.tamanho = 10
+        self.dano = 30
         self.posicao_projetil_x = 0
         self.posicao_projetil_y = 0
         self.range = 300
         self.destino = None
+        self.movimentando = False
         self.hitbox = (self.posicao_projetil_x, self.posicao_projetil_y, self.tamanho)
 
-projetil = projetil()
+Espada = projetil()
 
 #COLETÁVEIS
 
@@ -200,8 +235,6 @@ arma_no_chao = coletaveis((238,173,14), 10, posicao_da_bala_chao[0], posicao_da_
 item_Verde_coletado = False
 
 item_vida_coletada = False
-
-arma_no_chao_item = False
 
 #ARRUMAR ESSA PARTE
 Game_over = False
@@ -229,8 +262,10 @@ while run:
                 display.blit(block_black_floor, block_coords)
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
+    
     pg.draw.circle(display, item_Verde.color, (item_Verde.posicao_coletavel_x, item_Verde.posicao_coletavel_y), item_Verde.tamanho )
     pg.draw.circle(display, Vida_item.color, (Vida_item.posicao_coletavel_x, Vida_item.posicao_coletavel_y), Vida_item.tamanho)
+    torre.barra_De_vida()
 
     
 #DESENHO DO PLAYER E MOVIMENTAÇÂO COM OOP
@@ -246,24 +281,30 @@ while run:
     if keys[pg.K_SPACE] and Dama.posicao_y <= 735:
         if Dama.ammo > 0:
             if Dama.cima == True:
-                projetil.destino = [Dama.posicao_x, Dama.posicao_y-projetil.range]
-                posicao_da_bala_chao = projetil.destino
+                Espada.destino = (Dama.posicao_x, Dama.posicao_y-Espada.range)
+                posicao_da_bala_chao = Espada.destino
                 
             if Dama.direita == True:
-                projetil.destino = [Dama.posicao_x+projetil.range, Dama.posicao_y]
-                posicao_da_bala_chao = projetil.destino
+                Espada.destino = (Dama.posicao_x+Espada.range, Dama.posicao_y)
+                posicao_da_bala_chao = Espada.destino
 
             if Dama.esquerda == True:
-                projetil.destino = [Dama.posicao_x-projetil.range, Dama.posicao_y]
-                posicao_da_bala_chao = projetil.destino
+                Espada.destino = (Dama.posicao_x-Espada.range, Dama.posicao_y)
+                posicao_da_bala_chao = Espada.destino
 
             if Dama.baixo == True:
-                projetil.destino = [Dama.posicao_x, Dama.posicao_y+projetil.range]
-                posicao_da_bala_chao = projetil.destino
+                Espada.destino = (Dama.posicao_x, Dama.posicao_y+Espada.range)
+                posicao_da_bala_chao = Espada.destino
         
-
-#DESENHO DO BOOS E MOVIMENTAÇÃO COM OOP 
-    
+#BLOCO DE VERIFICAÇÃO SE O TEMPO DA IMUNIDADE DO PLAYER JÁ PASSOU
+    if hits > 0:
+        last_hit_time = pg.time.get_ticks() - static_timer_player
+        if last_hit_time > tempo_imune:
+            Dama.imune = False
+            if Dama.cor == AzulClaroFosco: #VERIFICA SE O PLAYER ESTÁ COM A COR FOSCA DA IMUNIDADE
+                Dama.cor = (0,0,123)
+            
+#DESENHO DO BOOS E MOVIMENTAÇÃO COM OOP
     if torre.vida > 0: # Se a vida da torre for < 0, a torre morre
         pg.draw.circle(display, torre.cor, (torre.bossX, torre.bossY), torre.raio)
     
@@ -283,16 +324,27 @@ while run:
 
         if not torre.is_jump: #Para ele não bater no player em cima no meio do pulo
             if calcularDistanciaPontos(Dama.posicao_x, torre.bossX, Dama.posicao_y, torre.bossY) <= 40:
-                Dama.vida -= 1
- 
- #FALTA COLOCAR UM TIMER AQUI PRO CARA N TOMAR INSTAKILL
-                
-                if Dama.vida == 0:
-                    while True:
-                        display.blit(game_over_img,(0,0))
-                        pg.display.update()    
-                        pg.time.delay(1500)
-                        pg.quit() 
+                if Dama.imune == False: # Verifica se o player está imune aos hits ainda (Variável)
+                    Dama.vida -= 1
+                    Dama.imune = True
+                    static_timer_player = pg.time.get_ticks()
+                    hits+=1
+                if Dama.imune == True: # Caso o player não esteja mais imune
+                    Dama.cor = (153,153,255)
+            if calcularDistanciaPontos(Espada.posicao_projetil_x, torre.bossX, Espada.posicao_projetil_y, torre.bossY) <= 30 and Espada.movimentando:
+                torre.tomar_dano(Espada.dano)
+                Espada.destino = (Espada.posicao_projetil_x, Espada.posicao_projetil_y)              
+                Espada.dano = 0      
+                posicao_da_bala_chao = Espada.destino   
+                        
+    #VERIFICANDO SE PLAYER PERDEU (GAME OVER)
+    if Dama.vida == 0:
+        while True:
+            display.blit(game_over_img,(0,0))
+            pg.display.update()    
+            pg.time.delay(1500)
+            pg.quit()
+                    
 
 #MUDANÇA DE LUGAR DO ITEM / IDENTIFICAÇÃO SE ITEM FOI COLETADO
     
@@ -348,64 +400,77 @@ while run:
 
     if distacia_da_bala_chao <= 20:
         Dama.ammo = 1
-        projetil.destino = None
+        Espada.destino = None
+        Espada.dano = 30
 
 
     if static_timer:
         last_item_time = pg.time.get_ticks() - static_timer
 
 #MOVIMENTAÇÃO DO PROJÉTIL
-   
     if Dama.ammo > 0:
         if Dama.cima:
-            projetil.posicao_projetil_x = Dama.posicao_x
-            projetil.posicao_projetil_y = Dama.posicao_y-20
+            Espada.posicao_projetil_x = Dama.posicao_x
+            Espada.posicao_projetil_y = Dama.posicao_y-20
             
         elif Dama.direita:
-            projetil.posicao_projetil_x = Dama.posicao_x+20
-            projetil.posicao_projetil_y = Dama.posicao_y
+            Espada.posicao_projetil_x = Dama.posicao_x+20
+            Espada.posicao_projetil_y = Dama.posicao_y
             
         elif Dama.esquerda:
-            projetil.posicao_projetil_x = Dama.posicao_x-20
-            projetil.posicao_projetil_y = Dama.posicao_y
+            Espada.posicao_projetil_x = Dama.posicao_x-20
+            Espada.posicao_projetil_y = Dama.posicao_y
             
         elif Dama.baixo:
-            projetil.posicao_projetil_x = Dama.posicao_x
-            projetil.posicao_projetil_y = Dama.posicao_y+20
+            Espada.posicao_projetil_x = Dama.posicao_x
+            Espada.posicao_projetil_y = Dama.posicao_y+20
+
+#
             
-    if projetil.destino != None:
-        if not projetil.destino == (projetil.posicao_projetil_x, projetil.posicao_projetil_y):
+    if Espada.destino != None:
+        if not Espada.destino == (Espada.posicao_projetil_x, Espada.posicao_projetil_y):
+            Espada.movimentando = True
             Dama.ammo = 0
             #
-            if projetil.destino[0]>projetil.posicao_projetil_x:
-                if (projetil.destino[0] - projetil.posicao_projetil_x)<5:
+            if Espada.destino[0]>Espada.posicao_projetil_x:
+                if (Espada.destino[0] - Espada.posicao_projetil_x)<5:
                     
-                    projetil.posicao_projetil_x = projetil.destino[0]
+                    Espada.posicao_projetil_x = Espada.destino[0]
+                    
                 else:
-                    projetil.posicao_projetil_x += 5
+                    Espada.posicao_projetil_x += 5
                     
-            if projetil.destino[0]<projetil.posicao_projetil_x:
-                if (projetil.posicao_projetil_x - projetil.destino[0])<5:
+            if Espada.destino[0]<Espada.posicao_projetil_x:
+                if (Espada.posicao_projetil_x - Espada.destino[0])<5:
                     
-                    projetil.posicao_projetil_x = projetil.destino[0]
+                    Espada.posicao_projetil_x = Espada.destino[0]
+                    
                 else:
-                    projetil.posicao_projetil_x -= 5
+                    Espada.posicao_projetil_x -= 5
             #
-            if projetil.destino[1]>projetil.posicao_projetil_y:
-                if (projetil.destino[1] - projetil.posicao_projetil_y)<5:
+            if Espada.destino[1]>Espada.posicao_projetil_y:
+                if (Espada.destino[1] - Espada.posicao_projetil_y)<5:
                     
-                    projetil.posicao_projetil_y = projetil.destino[1]
+                    Espada.posicao_projetil_y = Espada.destino[1]
+                    
                 else:
-                    projetil.posicao_projetil_y += 5
+                    Espada.posicao_projetil_y += 5
                     
-            if projetil.destino[1]<projetil.posicao_projetil_y:
-                if (projetil.posicao_projetil_y - projetil.destino[1])<5:
+            if Espada.destino[1]<Espada.posicao_projetil_y:
+                if (Espada.posicao_projetil_y - Espada.destino[1])<5:
                     
-                    projetil.posicao_projetil_y = projetil.destino[1]
+                    Espada.posicao_projetil_y = Espada.destino[1]
+                    
                 else:
-                    projetil.posicao_projetil_y -= 5
-    pg.draw.circle(display, projetil.color, (projetil.posicao_projetil_x, projetil.posicao_projetil_y), projetil.tamanho)
+                    Espada.posicao_projetil_y -= 5
+                    
+        else:
+            Espada.destino = None #Caso tenha chegado no destino, volta a ser destino = None
+    else:
+        Espada.movimentando = False #Já que o destino virou None no tick passado, ele deixa de estar em movimento
    
+    pg.draw.circle(display, Espada.color, (Espada.posicao_projetil_x, Espada.posicao_projetil_y), Espada.tamanho)
+
     pg.display.update()
     clock.tick(60)
     

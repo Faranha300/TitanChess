@@ -1,10 +1,11 @@
-from pydoc import visiblename
 import pygame as pg 
 import sys 
 import utils.constants as constants
 import utils.matrix_transformations as mt
 import sprite_mananger.sprite_mananger as sm
 import random
+import player.player as entitie_player
+
 
 clock = pg.time.Clock()
 display = pg.display.set_mode(constants.WINDOW_SIZE, 0, 32)
@@ -12,9 +13,10 @@ display = pg.display.set_mode(constants.WINDOW_SIZE, 0, 32)
 tile_sheet_image = pg.image.load('./resources/atlas/iso_tileset1.png')
 tile_sheet = sm.SpriteManganger(tile_sheet_image)
 
-block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
+block_black_floor = tile_sheet.get_image(0, 0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 
-block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
+block_white_floor = tile_sheet.get_image(1, 0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
+
 
 #CORES USADAS:
 AzulMarinho = (0,0,123) #Player
@@ -37,76 +39,6 @@ tempo_imune = 3000 #milisegundos
 
 #PLAYER
 hits = 0
-
-class Player(object):
-    def __init__(self, posicao_x, posicao_y) -> None:
-        self.posicao_x = posicao_x
-        self.posicao_y = posicao_y
-        self.velocidade = 5
-        self.raio = 20
-        self.cor = (0,0,123)
-        self.hitbox = (self.posicao_x, self.posicao_y, self.raio)
-        self.ammo = 1
-        self.vida = 1
-        self.imune = False
-
-        self.cima = True
-        self.direita = False
-        self.esquerda = False
-        self.baixo = False
-        
-    def desenhar(self):
-        pg.draw.circle(display, self.cor, (self.posicao_x, self.posicao_y), self.raio)
-        
-    def andar(self):
-        keys = pg.key.get_pressed()
-    
-        if keys[pg.K_LEFT] and self.posicao_x >= 490:
-            self.posicao_x -= self.velocidade
-
-            Dama.esquerda = True
-            Dama.cima = False
-            Dama.direita = False
-            Dama.baixo = False
-
-        if keys[pg.K_RIGHT] and self.posicao_x <= 1440: 
-            self.posicao_x += self.velocidade
-
-            Dama.direita = True
-            Dama.cima = False
-            Dama.esquerda = False
-            Dama.baixo = False
-
-
-        if keys[pg.K_UP] and self.posicao_y >= 275:
-            self.posicao_y -= self.velocidade
-
-            Dama.cima = True
-            Dama.direita = False
-            Dama.esquerda = False
-            Dama.baixo = False
-
-        if keys[pg.K_DOWN] and self.posicao_y <= 735:
-            self.posicao_y += self.velocidade
-
-            Dama.baixo = True
-            Dama.cima = False
-            Dama.direita = False
-            Dama.esquerda = False
-    
-    def barra_de_vida(self):      
-        
-        if self.vida >= 1:           
-            pg.draw.circle(display, (254,0,123), (220,120), 10) 
-
-        if self.vida >= 2:           
-            pg.draw.circle(display, (254,0,123), (245,120), 10) 
-        
-        if self.vida >= 3:
-            pg.draw.circle(display, (254,0,123), (270,120), 10)
-
-            
-
 
 #BOSS
 
@@ -150,23 +82,23 @@ class Torre(Boss):
     def andar(self):
         if self.walkCount <= 0: # o Boss anda "2" vezes antes de parar
                 if distanciaX > 2 or distanciaX < -1: # Para o boss n ficar travando numa posição especifica (passível de mudança)
-                    if self.bossX < Dama.posicao_x and distanciaX > 0: # Direita
+                    if self.bossX < player.rect[0] and distanciaX > 0: # Direita
                         self.bossX += (torre.velI + 32)
                         sombra.posicao_X += (torre.velI + 32)
                         self.is_jump = True
                         
-                    elif self.bossX > Dama.posicao_x and distanciaX < 0: # Esquerda
+                    elif self.bossX > player.rect[0] and distanciaX < 0: # Esquerda
                         self.bossX -= (torre.velI + 32)
                         sombra.posicao_X -= (torre.velI + 32)
                         self.is_jump = True
                     
                 if distanciaY > 2 or distanciaY < -1:
-                    if self.bossY < Dama.posicao_y and distanciaY > 0: # Baixo
+                    if self.bossY < player.rect[1] and distanciaY > 0: # Baixo
                         self.bossY += self.velI
                         sombra.posicao_Y += self.velI
                         self.is_jump = True
                     
-                    elif self.bossY > Dama.posicao_y and distanciaY < 0: # Cima
+                    elif self.bossY > player.rect[1] and distanciaY < 0: # Cima
                         self.bossY -= self.velI
                         sombra.posicao_Y -= self.velI
                         self.is_jump = True
@@ -192,7 +124,15 @@ class Sombra(object):
         if torre.is_jump:
             pg.draw.circle(display, (54,54,54), (self.posicao_X, self.posicao_Y,), self.raio)
 
-Dama = Player(1200,500)
+#Dama = Player(1200,500)
+initial_position = (1200, 500)
+p_size = (21, 32)
+player_image = tile_sheet.get_image(0, 1, p_size[0], p_size[1], 2, (0, 0, 0) )
+mov_speed = 5 
+vida = 1 
+
+
+player = entitie_player.Player(initial_position, p_size, mov_speed, vida, 1, player_image)
 torre = Torre(constants.WINDOW_SIZE[0] // 2, constants.WINDOW_SIZE[1] // 2) 
 sombra = Sombra()          
 
@@ -269,47 +209,49 @@ while run:
 
     
 #DESENHO DO PLAYER E MOVIMENTAÇÂO COM OOP
- 
-    Dama.desenhar()
-    Dama.andar()
-    Dama.barra_de_vida()
+    player.draw(display) 
+    player.move()
+    player.barra_de_vida(display)
+    #Dama.desenhar()
+    #Dama.andar()
+    #Dama.barra_de_vida()
 
 #BALA
 
     keys = pg.key.get_pressed()
 
-    if keys[pg.K_SPACE] and Dama.posicao_y <= 735:
-        if Dama.ammo > 0:
-            if Dama.cima == True:
-                Espada.destino = (Dama.posicao_x, Dama.posicao_y-Espada.range)
+    if keys[pg.K_SPACE] and player.rect[1] <= 735:
+        if player.ammo > 0:
+            if player.direcao['cima'] == True:
+                Espada.destino = (player.rect[0], player.rect[1]-Espada.range)
                 posicao_da_bala_chao = Espada.destino
                 
-            if Dama.direita == True:
-                Espada.destino = (Dama.posicao_x+Espada.range, Dama.posicao_y)
+            if player.direcao['direita'] == True:
+                Espada.destino = (player.rect[0]+Espada.range, player.rect[1])
                 posicao_da_bala_chao = Espada.destino
 
-            if Dama.esquerda == True:
-                Espada.destino = (Dama.posicao_x-Espada.range, Dama.posicao_y)
+            if player.direcao['esquerda'] == True:
+                Espada.destino = (player.rect[0]-Espada.range, player.rect[1])
                 posicao_da_bala_chao = Espada.destino
 
-            if Dama.baixo == True:
-                Espada.destino = (Dama.posicao_x, Dama.posicao_y+Espada.range)
+            if player.direcao['baixo'] == True:
+                Espada.destino = (player.rect[0], player.rect[1]+Espada.range)
                 posicao_da_bala_chao = Espada.destino
         
 #BLOCO DE VERIFICAÇÃO SE O TEMPO DA IMUNIDADE DO PLAYER JÁ PASSOU
     if hits > 0:
         last_hit_time = pg.time.get_ticks() - static_timer_player
         if last_hit_time > tempo_imune:
-            Dama.imune = False
-            if Dama.cor == AzulClaroFosco: #VERIFICA SE O PLAYER ESTÁ COM A COR FOSCA DA IMUNIDADE
-                Dama.cor = (0,0,123)
+            player.imune = False
+            #if Dama.cor == AzulClaroFosco: #VERIFICA SE O PLAYER ESTÁ COM A COR FOSCA DA IMUNIDADE
+                #Dama.cor = (0,0,123)
             
 #DESENHO DO BOOS E MOVIMENTAÇÃO COM OOP
     if torre.vida > 0: # Se a vida da torre for < 0, a torre morre
         pg.draw.circle(display, torre.cor, (torre.bossX, torre.bossY), torre.raio)
     
-        distanciaX = Dama.posicao_x - torre.bossX # Distancia entre o player e o boss na posição X
-        distanciaY = Dama.posicao_y - torre.bossY # Distancia entre o player e o boss na posição Y
+        distanciaX = player.rect[0] - torre.bossX # Distancia entre o player e o boss na posição X
+        distanciaY = player.rect[1] - torre.bossY # Distancia entre o player e o boss na posição Y
 
         if not torre.is_jump: #Caso não esteja pulando, anda
             torre.andar()
@@ -323,14 +265,14 @@ while run:
             torre.walkCount = 0
 
         if not torre.is_jump: #Para ele não bater no player em cima no meio do pulo
-            if calcularDistanciaPontos(Dama.posicao_x, torre.bossX, Dama.posicao_y, torre.bossY) <= 40:
-                if Dama.imune == False: # Verifica se o player está imune aos hits ainda (Variável)
-                    Dama.vida -= 1
-                    Dama.imune = True
+            if calcularDistanciaPontos(player.rect[0], torre.bossX, player.rect[1], torre.bossY) <= 40:
+                if player.imune == False: # Verifica se o player está imune aos hits ainda (Variável)
+                    player.vida -= 1
+                    player.imune = True
                     static_timer_player = pg.time.get_ticks()
                     hits+=1
-                if Dama.imune == True: # Caso o player não esteja mais imune
-                    Dama.cor = (153,153,255)
+                #if player.imune == True: # Caso o player não esteja mais imune
+                    #Dama.cor = (153,153,255)
             if calcularDistanciaPontos(Espada.posicao_projetil_x, torre.bossX, Espada.posicao_projetil_y, torre.bossY) <= 30 and Espada.movimentando:
                 torre.tomar_dano(Espada.dano)
                 Espada.destino = (Espada.posicao_projetil_x, Espada.posicao_projetil_y)              
@@ -338,7 +280,7 @@ while run:
                 posicao_da_bala_chao = Espada.destino   
                         
     #VERIFICANDO SE PLAYER PERDEU (GAME OVER)
-    if Dama.vida == 0:
+    if player.vida == 0:
         while True:
             display.blit(game_over_img,(0,0))
             pg.display.update()    
@@ -354,8 +296,8 @@ while run:
             cords_item_Verde = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
             item_Verde = coletaveis((61,145,64), 10, cords_item_Verde[0], cords_item_Verde[1])
             item_Verde_coletado = False
-            Dama.velocidade -= 2
-            Dama.cor  = (0,0,255)
+            player.velocidade -= 2
+            #Dama.cor  = (0,0,255)
     
     if item_vida_coletada:
 
@@ -369,12 +311,13 @@ while run:
             
 #IDENTIFICAÇÃO DE COLISÃO COM O ITEM e CD para SPAWN
         
-    distanciaPlayerObjeto = calcularDistanciaPontos(Dama.posicao_x, item_Verde.posicao_coletavel_x, Dama.posicao_y, item_Verde.posicao_coletavel_y)
+    distanciaPlayerObjeto = calcularDistanciaPontos(player.rect[0], item_Verde.posicao_coletavel_x, player.rect[1], item_Verde.posicao_coletavel_y)
+
     
     if distanciaPlayerObjeto <= 20:       
        
-        Dama.velocidade += 2
-        Dama.cor = (0,238,238)           
+        player.velocidade += 2
+        #Dama.cor = (0,238,238)           
         item_Verde.posicao_coletavel_x = 0
         item_Verde.posicao_coletavel_y = 0
         item_Verde.color = (146, 244, 255)
@@ -383,11 +326,11 @@ while run:
     
         item_Verde_coletado = True
 
-    distanciaPlayerObjeto_2 = calcularDistanciaPontos(Dama.posicao_x, Vida_item.posicao_coletavel_x, Dama.posicao_y, Vida_item.posicao_coletavel_y)
+    distanciaPlayerObjeto_2 = calcularDistanciaPontos(player.rect[0], Vida_item.posicao_coletavel_x, player.rect[1], Vida_item.posicao_coletavel_y)
 
     if distanciaPlayerObjeto_2 <= 20:
-        if Dama.vida <= 3:
-            Dama.vida += 1
+        if player.vida <= 3:
+            player.vida += 1
 
         Vida_item.posicao_coletavel_x = 0
         Vida_item.posicao_coletavel_y = 0
@@ -396,10 +339,10 @@ while run:
     
         item_vida_coletada = True
     
-    distacia_da_bala_chao = calcularDistanciaPontos(Dama.posicao_x, posicao_da_bala_chao[0], Dama.posicao_y, posicao_da_bala_chao[1])
+    distacia_da_bala_chao = calcularDistanciaPontos(player.rect[0], posicao_da_bala_chao[0], player.rect[1], posicao_da_bala_chao[1])
 
     if distacia_da_bala_chao <= 20:
-        Dama.ammo = 1
+        player.ammo = 1
         Espada.destino = None
         Espada.dano = 30
 
@@ -408,29 +351,29 @@ while run:
         last_item_time = pg.time.get_ticks() - static_timer
 
 #MOVIMENTAÇÃO DO PROJÉTIL
-    if Dama.ammo > 0:
-        if Dama.cima:
-            Espada.posicao_projetil_x = Dama.posicao_x
-            Espada.posicao_projetil_y = Dama.posicao_y-20
+    if player.ammo > 0:
+        if player.direcao['cima']:
+            Espada.posicao_projetil_x = player.rect[0]
+            Espada.posicao_projetil_y = player.rect[1]-20
             
-        elif Dama.direita:
-            Espada.posicao_projetil_x = Dama.posicao_x+20
-            Espada.posicao_projetil_y = Dama.posicao_y
+        elif player.direcao['direita']:
+            Espada.posicao_projetil_x = player.rect[0]+20
+            Espada.posicao_projetil_y = player.rect[1]
             
-        elif Dama.esquerda:
-            Espada.posicao_projetil_x = Dama.posicao_x-20
-            Espada.posicao_projetil_y = Dama.posicao_y
+        elif player.direcao['esquerda']:
+            Espada.posicao_projetil_x = player.rect[0]-20
+            Espada.posicao_projetil_y = player.rect[1]
             
-        elif Dama.baixo:
-            Espada.posicao_projetil_x = Dama.posicao_x
-            Espada.posicao_projetil_y = Dama.posicao_y+20
+        elif player.direcao['baixo']:
+            Espada.posicao_projetil_x = player.rect[0]
+            Espada.posicao_projetil_y = player.rect[1]+20
 
 #
             
     if Espada.destino != None:
         if not Espada.destino == (Espada.posicao_projetil_x, Espada.posicao_projetil_y):
             Espada.movimentando = True
-            Dama.ammo = 0
+            player.ammo = 0
             #
             if Espada.destino[0]>Espada.posicao_projetil_x:
                 if (Espada.destino[0] - Espada.posicao_projetil_x)<5:

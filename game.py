@@ -1,10 +1,11 @@
-from pydoc import visiblename
+from dis import dis
 import pygame as pg 
 import sys 
 import utils.constants as constants
 import utils.matrix_transformations as mt
 import sprite_mananger.sprite_mananger as sm
 import random
+
 
 clock = pg.time.Clock()
 display = pg.display.set_mode(constants.WINDOW_SIZE, 0, 32)
@@ -61,7 +62,7 @@ class Player(object):
     def andar(self):
         keys = pg.key.get_pressed()
     
-        if keys[pg.K_LEFT] and self.posicao_x >= 490:
+        if keys[pg.K_LEFT]: #and self.posicao_x >= 490:
             self.posicao_x -= self.velocidade
 
             Dama.esquerda = True
@@ -69,7 +70,7 @@ class Player(object):
             Dama.direita = False
             Dama.baixo = False
 
-        if keys[pg.K_RIGHT] and self.posicao_x <= 1440: 
+        if keys[pg.K_RIGHT]: #and self.posicao_x <= 1440: 
             self.posicao_x += self.velocidade
 
             Dama.direita = True
@@ -78,7 +79,7 @@ class Player(object):
             Dama.baixo = False
 
 
-        if keys[pg.K_UP] and self.posicao_y >= 275:
+        if keys[pg.K_UP]: #and self.posicao_y >= 275:
             self.posicao_y -= self.velocidade
 
             Dama.cima = True
@@ -86,7 +87,7 @@ class Player(object):
             Dama.esquerda = False
             Dama.baixo = False
 
-        if keys[pg.K_DOWN] and self.posicao_y <= 735:
+        if keys[pg.K_DOWN]: #and self.posicao_y <= 735:
             self.posicao_y += self.velocidade
 
             Dama.baixo = True
@@ -251,8 +252,12 @@ while run:
     for event in pg.event.get():
         if event.type == pg.QUIT:            
             run = False
+
+
+
 #CONSTRUÇÂO DO TABULEIRO           
 
+ 
     for row in range(8):
         for col in range(8):
             block_coords = mt.mudanca_base(row, col, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
@@ -260,6 +265,22 @@ while run:
                 display.blit(block_white_floor, block_coords)
             else:
                 display.blit(block_black_floor, block_coords)
+
+#bordas do tabuleiro  
+   
+    ponto_1, ponto_2, ponto_3 = [965,250], [1470,500], [1390, 210]
+    ponto_4, ponto_5, ponto_6 = [955,770], [1470,510],  [1395, 815]
+    ponto_7, ponto_8, ponto_9 = [450,505], [960, 250], [545,195]
+    ponto_10, ponto_11, ponto_12 = [405,830], [455,505], [955,770]
+    
+    #cor = (146, 244, 255)
+    cor = (0, 0, 0)
+    largura_tri = 1
+   
+    pg.draw.polygon(display, cor, [ponto_1, ponto_2, ponto_3], largura_tri)
+    pg.draw.polygon(display, cor, [ponto_4, ponto_5, ponto_6], largura_tri)
+    pg.draw.polygon(display, cor, [ponto_7, ponto_8, ponto_9], largura_tri)
+    pg.draw.polygon(display, cor, [ponto_10, ponto_11, ponto_12], largura_tri)
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
     
@@ -325,7 +346,7 @@ while run:
         if not torre.is_jump: #Para ele não bater no player em cima no meio do pulo
             if calcularDistanciaPontos(Dama.posicao_x, torre.bossX, Dama.posicao_y, torre.bossY) <= 40:
                 if Dama.imune == False: # Verifica se o player está imune aos hits ainda (Variável)
-                    Dama.vida -= 1
+                    #Dama.vida -= 1
                     Dama.imune = True
                     static_timer_player = pg.time.get_ticks()
                     hits+=1
@@ -470,6 +491,7 @@ while run:
         Espada.movimentando = False #Já que o destino virou None no tick passado, ele deixa de estar em movimento
    
     pg.draw.circle(display, Espada.color, (Espada.posicao_projetil_x, Espada.posicao_projetil_y), Espada.tamanho)
+    print(Dama.posicao_x, Dama.posicao_y)
 
     pg.display.update()
     clock.tick(60)

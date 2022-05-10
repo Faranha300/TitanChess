@@ -143,26 +143,25 @@ class Boss(object):
 class Torre(Boss):
     def andar(self):
         if self.walkCount <= 0: # o Boss anda "2" vezes antes de parar
-                if distanciaX > 2 or distanciaX < -1: # Para o boss n ficar travando numa posição especifica (passível de mudança)
-                    if self.bossX <= Dama.posicao_x and distanciaX >= 0: # Direita
-                        self.bossX += (self.velI + 32)
-                        sombra.posicao_X += (self.velI + 32)
-                        self.is_jump = True
-                
-                    elif self.bossX > Dama.posicao_x and distanciaX < 0: # Esquerda
-                        self.bossX -= (self.velI + 32)
-                        sombra.posicao_X -= (self.velI + 32)
-                        self.is_jump = True
-                        
-                    if self.bossY <= Dama.posicao_y and distanciaY >= 0: # Baixo
-                        self.bossY += self.velI
-                        sombra.posicao_Y += self.velI
-                        self.is_jump = True
+                if self.bossX <= Dama.posicao_x and distanciaX >= 0: # Direita
+                    self.bossX += (self.velI + 32)
+                    sombra.posicao_X += (self.velI + 32)
+                    self.is_jump = True
+            
+                elif self.bossX > Dama.posicao_x and distanciaX < 0: # Esquerda
+                    self.bossX -= (self.velI + 32)
+                    sombra.posicao_X -= (self.velI + 32)
+                    self.is_jump = True
                     
-                    elif self.bossY > Dama.posicao_y and distanciaY < 0: # Cima
-                        self.bossY -= self.velI
-                        sombra.posicao_Y -= self.velI
-                        self.is_jump = True
+                if self.bossY <= Dama.posicao_y and distanciaY >= 0: # Baixo
+                    self.bossY += self.velI
+                    sombra.posicao_Y += self.velI
+                    self.is_jump = True
+                
+                elif self.bossY > Dama.posicao_y and distanciaY < 0: # Cima
+                    self.bossY -= self.velI
+                    sombra.posicao_Y -= self.velI
+                    self.is_jump = True
 
     def pular(self):
         self.is_jump = True
@@ -328,7 +327,7 @@ while Game.running:
         if not torre.is_jump: #Para ele não bater no player em cima no meio do pulo
             if calcularDistanciaPontos(Dama.posicao_x, torre.bossX, Dama.posicao_y, torre.bossY) <= 40:
                 if Dama.imune == False: # Verifica se o player está imune aos hits ainda (Variável)
-                    Dama.vida -= 0
+                    Dama.vida -= 1
                     Dama.imune = True
                     static_timer_player = pg.time.get_ticks()
                     hits+=1

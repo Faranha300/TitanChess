@@ -14,7 +14,6 @@ tile_sheet_image = pg.image.load('./resources/atlas/iso_tileset1.png')
 tile_sheet = sm.SpriteManganger(tile_sheet_image)
 
 block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
-
 block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 
 #CORES USADAS:
@@ -33,17 +32,15 @@ last_item_time = None
 #CONTADORES DE TEMPO DE DANO AO PLAYER
 static_timer_player = None
 last_hit_time = None
-
 tempo_imune = 3000 #milisegundos
-
-#PLAYER
 hits = 0
+
 
 class Player(object):
     def __init__(self, posicao_x, posicao_y) -> None:
         self.posicao_x = posicao_x
         self.posicao_y = posicao_y
-        self.velocidade = 5
+        self.velocidade = 3
         self.raio = 20
         self.cor = (0,0,123)
         self.hitbox = (self.posicao_x, self.posicao_y, self.raio)
@@ -97,16 +94,14 @@ class Player(object):
     
     def barra_de_vida(self):      
         
+        coracao_sprite = pg.image.load('./resources/atlas/heart pixel art 48x48.png')
+
         if self.vida >= 1:           
-            pg.draw.circle(display, (254,0,123), (220,120), 10) 
-
+            display.blit(coracao_sprite,(220,120))
         if self.vida >= 2:           
-            pg.draw.circle(display, (254,0,123), (245,120), 10) 
-        
+            display.blit(coracao_sprite,(275,120))  
         if self.vida >= 3:
-            pg.draw.circle(display, (254,0,123), (270,120), 10)
-
-            
+            display.blit(coracao_sprite,(330,120))
 
 
 #BOSS
@@ -266,26 +261,14 @@ while run:
             else:
                 display.blit(block_black_floor, block_coords)
 
-#bordas do tabuleiro  
-   
-    ponto_1, ponto_2, ponto_3 = [965,250], [1470,500], [1390, 210]
-    ponto_4, ponto_5, ponto_6 = [955,770], [1470,510],  [1395, 815]
-    ponto_7, ponto_8, ponto_9 = [450,505], [960, 250], [545,195]
-    ponto_10, ponto_11, ponto_12 = [405,830], [455,505], [955,770]
-    
-    #cor = (146, 244, 255)
-    cor = (0, 0, 0)
-    largura_tri = 1
-   
-    pg.draw.polygon(display, cor, [ponto_1, ponto_2, ponto_3], largura_tri)
-    pg.draw.polygon(display, cor, [ponto_4, ponto_5, ponto_6], largura_tri)
-    pg.draw.polygon(display, cor, [ponto_7, ponto_8, ponto_9], largura_tri)
-    pg.draw.polygon(display, cor, [ponto_10, ponto_11, ponto_12], largura_tri)
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
+    item_vida_sprite = pg.image.load('./resources/atlas/heart_full_32x32.png')
+    item_velocidade_Sprite = pg.image.load('./resources/atlas/Emerald.png')
     
-    pg.draw.circle(display, item_Verde.color, (item_Verde.posicao_coletavel_x, item_Verde.posicao_coletavel_y), item_Verde.tamanho )
-    pg.draw.circle(display, Vida_item.color, (Vida_item.posicao_coletavel_x, Vida_item.posicao_coletavel_y), Vida_item.tamanho)
+    display.blit(item_vida_sprite, (Vida_item.posicao_coletavel_x - 10, Vida_item.posicao_coletavel_y - 20))
+    display.blit(item_velocidade_Sprite, (item_Verde.posicao_coletavel_x-20, item_Verde.posicao_coletavel_y-30))
+   
     torre.barra_De_vida()
 
     
@@ -459,7 +442,7 @@ while run:
                     Espada.posicao_projetil_x = Espada.destino[0]
                     
                 else:
-                    Espada.posicao_projetil_x += 5
+                    Espada.posicao_projetil_x += 8
                     
             if Espada.destino[0]<Espada.posicao_projetil_x:
                 if (Espada.posicao_projetil_x - Espada.destino[0])<5:
@@ -467,7 +450,7 @@ while run:
                     Espada.posicao_projetil_x = Espada.destino[0]
                     
                 else:
-                    Espada.posicao_projetil_x -= 5
+                    Espada.posicao_projetil_x -= 8
             #
             if Espada.destino[1]>Espada.posicao_projetil_y:
                 if (Espada.destino[1] - Espada.posicao_projetil_y)<5:
@@ -475,7 +458,7 @@ while run:
                     Espada.posicao_projetil_y = Espada.destino[1]
                     
                 else:
-                    Espada.posicao_projetil_y += 5
+                    Espada.posicao_projetil_y += 8
                     
             if Espada.destino[1]<Espada.posicao_projetil_y:
                 if (Espada.posicao_projetil_y - Espada.destino[1])<5:
@@ -483,7 +466,7 @@ while run:
                     Espada.posicao_projetil_y = Espada.destino[1]
                     
                 else:
-                    Espada.posicao_projetil_y -= 5
+                    Espada.posicao_projetil_y -= 8
                     
         else:
             Espada.destino = None #Caso tenha chegado no destino, volta a ser destino = None
@@ -491,7 +474,6 @@ while run:
         Espada.movimentando = False #Já que o destino virou None no tick passado, ele deixa de estar em movimento
    
     pg.draw.circle(display, Espada.color, (Espada.posicao_projetil_x, Espada.posicao_projetil_y), Espada.tamanho)
-    print(Dama.posicao_x, Dama.posicao_y)
 
     pg.display.update()
     clock.tick(60)

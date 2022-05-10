@@ -189,6 +189,13 @@ torre = Torre(constants.WINDOW_SIZE[0] // 2, constants.WINDOW_SIZE[1] // 2)
 sombra = Sombra()          
 
 #PROJÉTIL
+#imgs dos projéteis
+
+Espadinha_cima_sprite = pg.image.load('./resources/atlas/ESPADINHA_CIMA.png')
+Espadinha_baixo_sprite = pg.image.load('./resources/atlas/ESPADINHA_BAIXO.png')
+Espadinha_esquerda_sprite = pg.image.load('./resources/atlas/ESPADINHA_ESQUERDA.png')
+Espadinha_direita_sprite = pg.image.load('./resources/atlas/ESPADINHA_DIREITA.png')
+
 
 class projetil(object):
     def __init__(self):
@@ -201,6 +208,7 @@ class projetil(object):
         self.destino = None
         self.movimentando = False
         self.hitbox = (self.posicao_projetil_x, self.posicao_projetil_y, self.tamanho)
+    
 
 Espada = projetil()
 
@@ -324,7 +332,7 @@ while Game.running:
         if not torre.is_jump: #Para ele não bater no player em cima no meio do pulo
             if calcularDistanciaPontos(Dama.posicao_x, torre.bossX, Dama.posicao_y, torre.bossY) <= 40:
                 if Dama.imune == False: # Verifica se o player está imune aos hits ainda (Variável)
-                    Dama.vida -= 1
+                    Dama.vida -= 0
                     Dama.imune = True
                     static_timer_player = pg.time.get_ticks()
                     hits+=1
@@ -467,8 +475,27 @@ while Game.running:
             Espada.destino = None #Caso tenha chegado no destino, volta a ser destino = None
     else:
         Espada.movimentando = False #Já que o destino virou None no tick passado, ele deixa de estar em movimento
-   
-    pg.draw.circle(display, Espada.color, (Espada.posicao_projetil_x, Espada.posicao_projetil_y), Espada.tamanho)
+#SPRITE DA ESPADA DESENHO   
+    if Dama.ammo > 0:
+        if Dama.esquerda:
+            display.blit(Espadinha_esquerda_sprite, (Espada.posicao_projetil_x - 30, Espada.posicao_projetil_y-20))
+            ultima_posicao_projetil = Espadinha_esquerda_sprite
+        if Dama.direita:
+            display.blit(Espadinha_direita_sprite, (Espada.posicao_projetil_x - 12, Espada.posicao_projetil_y - 20))
+            ultima_posicao_projetil = Espadinha_direita_sprite
+        if Dama.cima:
+            display.blit(Espadinha_cima_sprite, (Espada.posicao_projetil_x - 25, Espada.posicao_projetil_y-30))
+            ultima_posicao_projetil = Espadinha_cima_sprite
+
+        if Dama.baixo:
+            display.blit(Espadinha_baixo_sprite, (Espada.posicao_projetil_x - 25, Espada.posicao_projetil_y-15))
+            ultima_posicao_projetil = Espadinha_baixo_sprite
+
+    else:
+        display.blit(ultima_posicao_projetil,(Espada.posicao_projetil_x, Espada.posicao_projetil_y))
+
+
+        
 
     pg.display.update()
     clock.tick(60)

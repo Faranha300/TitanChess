@@ -14,6 +14,8 @@ tile_sheet = sm.SpriteManganger(tile_sheet_image)
 
 block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
+orbe = tile_sheet.get_image(2, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 1, (0, 0, 0))
+torre_img = tile_sheet.get_image(3, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 2, (0, 0, 0))
 
 Game = Jogo()
 
@@ -191,11 +193,6 @@ sombra = Sombra()
 #PROJÉTIL
 #imgs dos projéteis
 
-Espadinha_cima_sprite = pg.image.load('./resources/atlas/ESPADINHA_CIMA.png')
-Espadinha_baixo_sprite = pg.image.load('./resources/atlas/ESPADINHA_BAIXO.png')
-Espadinha_esquerda_sprite = pg.image.load('./resources/atlas/ESPADINHA_ESQUERDA.png')
-Espadinha_direita_sprite = pg.image.load('./resources/atlas/ESPADINHA_DIREITA.png')
-
 
 class projetil(object):
     def __init__(self):
@@ -313,7 +310,7 @@ while Game.running:
             
 #DESENHO DO BOOS E MOVIMENTAÇÃO COM OOP
     if torre.vida > 0: # Se a vida da torre for < 0, a torre morre
-        pg.draw.circle(display, torre.cor, (torre.bossX, torre.bossY), torre.raio)
+        display.blit(torre_img, (torre.bossX-30, torre.bossY-50))
     
         distanciaX = Dama.posicao_x - torre.bossX # Distancia entre o player e o boss na posição X
         distanciaY = Dama.posicao_y - torre.bossY # Distancia entre o player e o boss na posição Y
@@ -475,27 +472,24 @@ while Game.running:
             Espada.destino = None #Caso tenha chegado no destino, volta a ser destino = None
     else:
         Espada.movimentando = False #Já que o destino virou None no tick passado, ele deixa de estar em movimento
-#SPRITE DA ESPADA DESENHO   
-    if Dama.ammo > 0:
-        if Dama.esquerda:
-            display.blit(Espadinha_esquerda_sprite, (Espada.posicao_projetil_x - 30, Espada.posicao_projetil_y-20))
-            ultima_posicao_projetil = Espadinha_esquerda_sprite
-        if Dama.direita:
-            display.blit(Espadinha_direita_sprite, (Espada.posicao_projetil_x - 12, Espada.posicao_projetil_y - 20))
-            ultima_posicao_projetil = Espadinha_direita_sprite
-        if Dama.cima:
-            display.blit(Espadinha_cima_sprite, (Espada.posicao_projetil_x - 25, Espada.posicao_projetil_y-30))
-            ultima_posicao_projetil = Espadinha_cima_sprite
 
+    if Dama.ammo > 0:   
+
+        if Dama.esquerda:
+            display.blit(orbe, (Espada.posicao_projetil_x-30, Espada.posicao_projetil_y-20))
+            chao = orbe
+        if Dama.direita:
+            display.blit(orbe, (Espada.posicao_projetil_x-10, Espada.posicao_projetil_y-20))
+            chao = orbe
+        if Dama.cima:
+            display.blit(orbe, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-30))
+            chao = orbe
         if Dama.baixo:
-            display.blit(Espadinha_baixo_sprite, (Espada.posicao_projetil_x - 25, Espada.posicao_projetil_y-15))
-            ultima_posicao_projetil = Espadinha_baixo_sprite
+            display.blit(orbe, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-20))
+            chao = orbe
 
     else:
-        display.blit(ultima_posicao_projetil,(Espada.posicao_projetil_x, Espada.posicao_projetil_y))
-
-
-        
+        display.blit(chao, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-20))
 
     pg.display.update()
     clock.tick(60)

@@ -1,6 +1,5 @@
-from dis import dis
+from Jogo import Jogo
 import pygame as pg 
-import sys 
 import utils.constants as constants
 import utils.matrix_transformations as mt
 import sprite_mananger.sprite_mananger as sm
@@ -15,6 +14,8 @@ tile_sheet = sm.SpriteManganger(tile_sheet_image)
 
 block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
+
+Game = Jogo()
 
 #CORES USADAS:
 AzulMarinho = (0,0,123) #Player
@@ -121,11 +122,6 @@ class Boss(object):
         self.vida = 400
         self.tamanho_da_barra_vida = 400
 
-
-    def atualizar(self):
-        self.barra_De_vida()
-        self.vida_animacao()
-
     def tomar_dano(self,dano_do_player):
         if self.vida > 0:
             self.vida -= dano_do_player       
@@ -198,7 +194,7 @@ class projetil(object):
     def __init__(self):
         self.color = (238,173,14)
         self.tamanho = 10
-        self.dano = 30
+        self.dano = 50
         self.posicao_projetil_x = 0
         self.posicao_projetil_y = 0
         self.range = 300
@@ -233,21 +229,20 @@ item_Verde_coletado = False
 item_vida_coletada = False
 
 #ARRUMAR ESSA PARTE
-Game_over = False
+
 game_over_img = pg.image.load('game_over.jpg')
+bck_gr = pg.image.load('Game_background.png')
+display.blit(bck_gr,(0,0))
 
 
 #MAIN LOOP
 
-run = True
-while run:
-    display.fill((146, 244, 255))
+while Game.running:   
 
 #SAIR DO JOGO        
     for event in pg.event.get():
         if event.type == pg.QUIT:            
             run = False
-
 
 
 #CONSTRUÇÂO DO TABULEIRO           
@@ -329,7 +324,7 @@ while run:
         if not torre.is_jump: #Para ele não bater no player em cima no meio do pulo
             if calcularDistanciaPontos(Dama.posicao_x, torre.bossX, Dama.posicao_y, torre.bossY) <= 40:
                 if Dama.imune == False: # Verifica se o player está imune aos hits ainda (Variável)
-                    #Dama.vida -= 1
+                    Dama.vida -= 1
                     Dama.imune = True
                     static_timer_player = pg.time.get_ticks()
                     hits+=1

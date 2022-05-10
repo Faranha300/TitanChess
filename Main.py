@@ -144,18 +144,17 @@ class Torre(Boss):
     def andar(self):
         if self.walkCount <= 0: # o Boss anda "2" vezes antes de parar
                 if distanciaX > 2 or distanciaX < -1: # Para o boss n ficar travando numa posição especifica (passível de mudança)
-                    if self.bossX < Dama.posicao_x and distanciaX > 0: # Direita
-                        self.bossX += (torre.velI + 32)
-                        sombra.posicao_X += (torre.velI + 32)
+                    if self.bossX <= Dama.posicao_x and distanciaX >= 0: # Direita
+                        self.bossX += (self.velI + 32)
+                        sombra.posicao_X += (self.velI + 32)
+                        self.is_jump = True
+                
+                    elif self.bossX > Dama.posicao_x and distanciaX < 0: # Esquerda
+                        self.bossX -= (self.velI + 32)
+                        sombra.posicao_X -= (self.velI + 32)
                         self.is_jump = True
                         
-                    elif self.bossX > Dama.posicao_x and distanciaX < 0: # Esquerda
-                        self.bossX -= (torre.velI + 32)
-                        sombra.posicao_X -= (torre.velI + 32)
-                        self.is_jump = True
-                    
-                if distanciaY > 2 or distanciaY < -1:
-                    if self.bossY < Dama.posicao_y and distanciaY > 0: # Baixo
+                    if self.bossY <= Dama.posicao_y and distanciaY >= 0: # Baixo
                         self.bossY += self.velI
                         sombra.posicao_Y += self.velI
                         self.is_jump = True

@@ -3,8 +3,6 @@ Baseado no belissimo TITAN SOULS
 
 ## COMO RODAR O PROJETO
 
-Por enquanto o projeto se encontra na branch `dev_jovanney`, troque para essa branch e siga as instruções abaixo.
-
 É recomendada a criação de uma [venv](https://docs.python.org/3/library/venv.html) para executar o projeto. (Se usar a versão do python do sistema é por sua conta e risco).
 
 Clone o repositório e instale o unico requisito para o projeto que a biblioteca `pygame`

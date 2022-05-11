@@ -111,6 +111,7 @@ def jogar_novamente():
                             sombra.posicao_X = constants.WINDOW_SIZE[0] // 2
                             sombra.posicao_Y = constants.WINDOW_SIZE[1] // 2
                             
+                            
                             item_vida_coletada = False
                             static_timer = None
                             last_item_time = None
@@ -528,8 +529,8 @@ while run:
        
         Dama.velocidade += 2
         Dama.cor = (0,238,238)           
-        item_Verde.posicao_coletavel_x = 0
-        item_Verde.posicao_coletavel_y = 0
+        item_Verde.posicao_coletavel_x = -30
+        item_Verde.posicao_coletavel_y = -30
         item_Verde.color = (146, 244, 255)
         item_Verde.tamanho = 0
         static_timer = pg.time.get_ticks()
@@ -542,8 +543,8 @@ while run:
         if Dama.vida <= 3:
             Dama.vida += 1
 
-        Vida_item.posicao_coletavel_x = 0
-        Vida_item.posicao_coletavel_y = 0
+        Vida_item.posicao_coletavel_x = -30
+        Vida_item.posicao_coletavel_y = -30
         Vida_item.tamanho = 0
         static_timer = pg.time.get_ticks()
     

@@ -1,3 +1,4 @@
+from operator import le
 from turtle import Screen
 import pygame as pg 
 import utils.constants as constants
@@ -19,16 +20,17 @@ block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOO
 orbe = tile_sheet.get_image(2, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 1, (0, 0, 0))
 torre_img = tile_sheet.get_image(3, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 2, (0, 0, 0))
 
-#ANIMAÇÃO SPRITE PLAYER#
-#andar direita
+#ANIMAÇÃO SPRITE PLAYER
+
+lista_animacao = []
+animacao_passos = 4
+ultima_atualizarcao = pg.time.get_ticks()
+velocidade_animacao = 150
+frame = 0
 
 
-
-lista_animacao_direita = []
-animacao_direita_passos = 9
-
-for x in range(animacao_direita_passos):
-    lista_animacao_direita.append(perso.get_image(x, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 2, (0, 0, 0)))
+for x in range(animacao_passos):
+    lista_animacao.append(perso.get_image(x, 29, 32, 2, (0, 0, 0)))
 
 #CORES USADAS:
 AzulMarinho = (0,0,123) #Player
@@ -49,7 +51,6 @@ last_hit_time = None
 tempo_imune = 3000 #milisegundos
 hits = 0
 
-
 class Player(object):
     def __init__(self, posicao_x, posicao_y) -> None:
         self.posicao_x = posicao_x
@@ -68,9 +69,9 @@ class Player(object):
         self.baixo = False
         
     def desenhar(self):
-        if self.direita:
-            for x in range(animacao_direita_passos):
-                display.blit(lista_animacao_direita[x], (Dama.posicao_x, Dama.posicao_y))
+        if self.direita:           
+            display.blit(lista_animacao[frame], (Dama.posicao_x - 29, Dama.posicao_y - 32))
+        
             
         
     def andar(self):
@@ -269,6 +270,16 @@ while True:
                 display.blit(block_white_floor, block_coords)
             else:
                 display.blit(block_black_floor, block_coords)
+
+#DESENHO E ANIMACAO DO PLAYER
+
+    current_time = pg.time.get_ticks()  
+
+    if current_time - ultima_atualizarcao >= velocidade_animacao:
+        frame += 1
+        ultima_atualizarcao = current_time
+        if frame >= len(lista_animacao):
+            frame = 0
 
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO

@@ -1,4 +1,3 @@
-from turtle import Screen
 import pygame as pg 
 import utils.constants as constants
 import utils.matrix_transformations as mt
@@ -11,25 +10,39 @@ display = pg.display.set_mode(constants.WINDOW_SIZE, 0, 32)
 
 tile_sheet_image = pg.image.load('./resources/atlas/iso_tileset1.png')
 tile_sheet = sm.SpriteManganger(tile_sheet_image)
-personagem_sheet = pg.image.load('./resources/atlas/personagem.png')
-perso = sm.SpriteManganger(personagem_sheet)
 
 block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
 orbe = tile_sheet.get_image(2, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 1, (0, 0, 0))
 torre_img = tile_sheet.get_image(3, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 2, (0, 0, 0))
 
-#ANIMAÇÃO SPRITE PLAYER#
-#andar direita
+border_TopLeft = []
+border_TopRight = []
+border_DownLeft = []
+border_DownRight = []
 
+for i in range(8):
+    VariavelX=(mt.mudanca_base(1, i, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][0]
+    VariavelY=(mt.mudanca_base(1, i, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][1]
+    
+    border_TopLeft.append((int(VariavelX)-30,int(VariavelY)-32, 20))
+for i in range(8):
+    VariavelX=(mt.mudanca_base(i+1, 0, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][0]
+    VariavelY=(mt.mudanca_base(i+1, 0, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][1]
+        
+    border_TopRight.append((int(VariavelX)+30,int(VariavelY)-32, 20))
+        
+for i in range(8):
+    VariavelX=(mt.mudanca_base(8, i, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][0]
+    VariavelY=(mt.mudanca_base(8, i, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][1]
 
+    border_DownRight.append((int(VariavelX)+30,int(VariavelY)+32, 20))
+        
+for i in range(8):
+    VariavelX=(mt.mudanca_base(i, 7, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][0]
+    VariavelY=(mt.mudanca_base(i, 7, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE),284,10,10)[0][1]
 
-lista_animacao_direita = []
-animacao_direita_passos = 9
-
-for x in range(animacao_direita_passos):
-    lista_animacao_direita.append(perso.get_image(x, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 2, (0, 0, 0)))
-
+    border_DownLeft.append((int(VariavelX)+30,int(VariavelY)+62, 20))
 #CORES USADAS:
 AzulMarinho = (0,0,123) #Player
 AzulClaroFosco = (153,153,255) #Imunidade
@@ -61,6 +74,10 @@ class Player(object):
         self.ammo = 1
         self.vida = 1
         self.imune = False
+        self.canMove={'cima' : True,
+                      'direita' : True,
+                      'esquerda': True,
+                      'baixo' : True}
 
         self.cima = True
         self.direita = False
@@ -68,24 +85,23 @@ class Player(object):
         self.baixo = False
         
     def desenhar(self):
-        if self.direita:
-            for x in range(animacao_direita_passos):
-                display.blit(lista_animacao_direita[x], (Dama.posicao_x, Dama.posicao_y))
-            
+        pg.draw.circle(display, self.cor, (self.posicao_x, self.posicao_y), self.raio)
         
     def andar(self):
         keys = pg.key.get_pressed()
     
         if keys[pg.K_LEFT]: #and self.posicao_x >= 490:
-            self.posicao_x -= self.velocidade
+            if Dama.canMove['esquerda']:
+                self.posicao_x -= self.velocidade
 
             Dama.esquerda = True
             Dama.cima = False
             Dama.direita = False
             Dama.baixo = False
 
-        if keys[pg.K_RIGHT]: #and self.posicao_x <= 1440: 
-            self.posicao_x += self.velocidade
+        if keys[pg.K_RIGHT]: #and self.posicao_x <= 1440:
+            if Dama.canMove['direita']:
+                self.posicao_x += self.velocidade
 
             Dama.direita = True
             Dama.cima = False
@@ -94,7 +110,8 @@ class Player(object):
 
 
         if keys[pg.K_UP]: #and self.posicao_y >= 275:
-            self.posicao_y -= self.velocidade
+            if Dama.canMove['cima']:
+                self.posicao_y -= self.velocidade
 
             Dama.cima = True
             Dama.direita = False
@@ -102,7 +119,8 @@ class Player(object):
             Dama.baixo = False
 
         if keys[pg.K_DOWN]: #and self.posicao_y <= 735:
-            self.posicao_y += self.velocidade
+            if Dama.canMove['baixo']:
+                self.posicao_y += self.velocidade
 
             Dama.baixo = True
             Dama.cima = False
@@ -249,7 +267,6 @@ item_vida_coletada = False
 
 game_over_img = pg.image.load('game_over.jpg')
 
-
 #MAIN LOOP
 
 while True:   
@@ -261,6 +278,7 @@ while True:
             run = False
 
 #CONSTRUÇÂO DO TABULEIRO           
+
  
     for row in range(8):
         for col in range(8):
@@ -269,7 +287,6 @@ while True:
                 display.blit(block_white_floor, block_coords)
             else:
                 display.blit(block_black_floor, block_coords)
-
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
     item_vida_sprite = pg.image.load('./resources/atlas/heart_full_32x32.png')
@@ -485,21 +502,50 @@ while True:
     if Dama.ammo > 0:   
 
         if Dama.esquerda:
-            #display.blit(orbe, (Espada.posicao_projetil_x-30, Espada.posicao_projetil_y-20))
+            display.blit(orbe, (Espada.posicao_projetil_x-30, Espada.posicao_projetil_y-20))
             chao = orbe
         if Dama.direita:
-            #display.blit(orbe, (Espada.posicao_projetil_x-10, Espada.posicao_projetil_y-20))
+            display.blit(orbe, (Espada.posicao_projetil_x-10, Espada.posicao_projetil_y-20))
             chao = orbe
         if Dama.cima:
-            #display.blit(orbe, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-30))
+            display.blit(orbe, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-30))
             chao = orbe
         if Dama.baixo:
-            #display.blit(orbe, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-20))
+            display.blit(orbe, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-20))
             chao = orbe
 
     else:
         display.blit(chao, (Espada.posicao_projetil_x-20, Espada.posicao_projetil_y-20))
 
+    #print(mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE))
+    #print(mt.mudanca_base(1, 0, constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE))
+    #960/284
+    Dama.canMove['cima'] = True
+    Dama.canMove['direita'] = True
+    Dama.canMove['esquerda'] = True
+    Dama.canMove['baixo'] = True
+    
+    for i in border_TopLeft:
+        if calcularDistanciaPontos(Dama.posicao_x, i[0], Dama.posicao_y, i[1])<40:
+            Dama.canMove['cima'] = False
+            Dama.canMove['esquerda'] = False
+
+    for i in border_TopRight:
+        if calcularDistanciaPontos(Dama.posicao_x, i[0], Dama.posicao_y, i[1])<40:
+            Dama.canMove['cima'] = False
+            Dama.canMove['direita'] = False
+
+    for i in border_DownLeft:
+        if calcularDistanciaPontos(Dama.posicao_x, i[0], Dama.posicao_y, i[1])<40:
+            Dama.canMove['baixo'] = False
+            Dama.canMove['esquerda'] = False
+
+    for i in border_DownRight:
+        if calcularDistanciaPontos(Dama.posicao_x, i[0], Dama.posicao_y, i[1])<40:
+            Dama.canMove['baixo'] = False
+            Dama.canMove['direita'] = False
+        
+        
     pg.display.update()
     clock.tick(60)
     

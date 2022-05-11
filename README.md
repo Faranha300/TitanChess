@@ -13,7 +13,7 @@ ou
 
 ```python3 -m pip install pygame```
 
-Em seguida no diretório raiz do projeto basta executar o `main.py`
+Em seguida no diretório raiz do projeto basta executar o `Main.py`
 
 ```python3 main.py```
 

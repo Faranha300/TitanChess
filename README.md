@@ -7,15 +7,15 @@ Baseado no belissimo TITAN SOULS
 
 Clone o repositório e instale o unico requisito para o projeto que a biblioteca `pygame`
 
-    ```pip install pygame```
+```pip install pygame```
 
 ou
 
-    ```python3 -m pip install pygame```
+```python3 -m pip install pygame```
 
 Em seguida no diretório raiz do projeto basta executar o `main.py`
 
-    ```python3 main.py```
+```python3 main.py```
 
 
 ## CONTRIBUIDORES

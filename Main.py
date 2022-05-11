@@ -121,7 +121,7 @@ class Boss(object):
         self.is_jump = True
         self.largura = 0
         self.altura = 0
-        self.vida = 400
+        self.vida = 50
         self.tamanho_da_barra_vida = 400
 
     def tomar_dano(self,dano_do_player):
@@ -235,18 +235,17 @@ item_vida_coletada = False
 
 game_over_img = pg.image.load('game_over.jpg')
 bck_gr = pg.image.load('Game_background.png')
-display.blit(bck_gr,(0,0))
 
 
 #MAIN LOOP
 
 while Game.running:   
+    display.fill((146, 244, 255))
 
 #SAIR DO JOGO        
     for event in pg.event.get():
         if event.type == pg.QUIT:            
             run = False
-
 
 #CONSTRUÇÂO DO TABULEIRO           
 
@@ -258,7 +257,6 @@ while Game.running:
                 display.blit(block_white_floor, block_coords)
             else:
                 display.blit(block_black_floor, block_coords)
-
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
     item_vida_sprite = pg.image.load('./resources/atlas/heart_full_32x32.png')

@@ -1,4 +1,3 @@
-from operator import le
 from turtle import Screen
 import pygame as pg 
 import utils.constants as constants
@@ -15,22 +14,30 @@ tile_sheet = sm.SpriteManganger(tile_sheet_image)
 personagem_sheet = pg.image.load('./resources/atlas/personagem.png')
 perso = sm.SpriteManganger(personagem_sheet)
 
-block_black_floor = tile_sheet.get_image(0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
-block_white_floor = tile_sheet.get_image(1, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
-orbe = tile_sheet.get_image(2, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 1, (0, 0, 0))
-torre_img = tile_sheet.get_image(3, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 2, (0, 0, 0))
+
+block_black_floor = tile_sheet.get_image(0, 0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
+block_white_floor = tile_sheet.get_image(1, 0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 4, (0, 0, 0))
+orbe = tile_sheet.get_image(2, 0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 1, (0, 0, 0))
+torre_img = tile_sheet.get_image(3, 0, constants.FLOOR_SIZE, constants.FLOOR_SIZE, 2, (0, 0, 0))
 
 #ANIMAÇÃO SPRITE PLAYER
 
 lista_animacao = []
-animacao_passos = 4
+animacao_linha = 4
+animacao_coluna = 9
 ultima_atualizarcao = pg.time.get_ticks()
 velocidade_animacao = 150
-frame = 0
+animacao_passo = []
 
+frame_direita = 27
+frame_esquerda = 9
+frame_cima = 0
+frame_baixo = 18
 
-for x in range(animacao_passos):
-    lista_animacao.append(perso.get_image(x, 29, 32, 2, (0, 0, 0)))
+for y in range(animacao_linha):
+    for x in range(animacao_coluna):
+        lista_animacao.append(perso.get_image(x,y+8, 64, 64, 1, (0, 0, 0)))
+        
 
 #CORES USADAS:
 AzulMarinho = (0,0,123) #Player
@@ -69,8 +76,16 @@ class Player(object):
         self.baixo = False
         
     def desenhar(self):
-        if self.direita:           
-            display.blit(lista_animacao[frame], (Dama.posicao_x - 29, Dama.posicao_y - 32))
+        if self.direita:
+            display.blit(lista_animacao[frame_direita], (Dama.posicao_x - 29, Dama.posicao_y - 32))
+        if self.esquerda:
+            display.blit(lista_animacao[frame_esquerda], (Dama.posicao_x - 29, Dama.posicao_y - 32))
+        if self.cima:
+            display.blit(lista_animacao[frame_cima], (Dama.posicao_x - 29, Dama.posicao_y - 32))
+        if self.baixo:
+            display.blit(lista_animacao[frame_baixo], (Dama.posicao_x - 29, Dama.posicao_y - 32))
+
+
         
             
         
@@ -274,12 +289,32 @@ while True:
 #DESENHO E ANIMACAO DO PLAYER
 
     current_time = pg.time.get_ticks()  
+    
+    if Dama.direita:
+        if current_time - ultima_atualizarcao >= velocidade_animacao:
+            frame_direita += 1
+            ultima_atualizarcao = current_time
+            if frame_direita >= 35:
+                frame_direita = 27
+    if Dama.esquerda:
+        if current_time - ultima_atualizarcao >= velocidade_animacao:
+            frame_esquerda += 1
+            ultima_atualizarcao = current_time
+            if frame_esquerda >= 17:
+                frame_esquerda = 9
+    if Dama.cima:
+        if current_time - ultima_atualizarcao >= velocidade_animacao:
+            frame_cima += 1
+            ultima_atualizarcao = current_time
+            if frame_cima >= 8:
+                frame_cima = 0
+    if Dama.baixo:
+        if current_time - ultima_atualizarcao >= velocidade_animacao:
+            frame_baixo += 1
+            ultima_atualizarcao = current_time
+            if frame_baixo >= 26:
+                frame_baixo = 18
 
-    if current_time - ultima_atualizarcao >= velocidade_animacao:
-        frame += 1
-        ultima_atualizarcao = current_time
-        if frame >= len(lista_animacao):
-            frame = 0
 
 
 #DESENHO DO COLETÁVEL MAIS ATRIBUTO
@@ -383,7 +418,7 @@ while True:
     
     if item_vida_coletada:
 
-        if last_item_time > 30000:
+        if last_item_time > 10000:
 
             cords_item_vida_drop = mt.mudanca_base(random.randint(1,8), random.randint(0,7), constants.FLOOR_SIZE*4, constants.MATRIZ_MUDA_BASE)
             Vida_item = coletaveis((255,0,226), 10, cords_item_vida_drop[0], cords_item_vida_drop[1])
@@ -413,8 +448,8 @@ while True:
         if Dama.vida <= 3:
             Dama.vida += 1
 
-        Vida_item.posicao_coletavel_x = 0
-        Vida_item.posicao_coletavel_y = 0
+        Vida_item.posicao_coletavel_x = -30
+        Vida_item.posicao_coletavel_y = - 30
         Vida_item.tamanho = 0
         static_timer = pg.time.get_ticks()
     

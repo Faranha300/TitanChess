@@ -15,7 +15,7 @@ ou
 
 Em seguida no diretório raiz do projeto basta executar o `Main.py`
 
-```python3 main.py```
+```python3 Main.py```
 
 
 ## CONTRIBUIDORES

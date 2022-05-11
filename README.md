@@ -22,7 +22,8 @@ Em seguida no diretório raiz do projeto basta executar o `main.py`
 
 ## CONTRIBUIDORES
 - [Caio Roberto da Silva Verçosa](https://github.com/CaioRSV)
-- Eduardo Noblat
+- Eduardo Vinnícius Duarte Costa Noblat
 - [Fabricio Aranha Ferreira](https://github.com/faranha300)
 - [Hugo Felix Marques](https://github.com/hggmarks)
 - [Jose Jovanney Silva Lima](https://github.com/jovanney)
+- Rogério da Silva Alves Filho

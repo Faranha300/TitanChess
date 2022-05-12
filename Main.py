@@ -617,7 +617,7 @@ while run:
     if distacia_da_bala_chao <= 20:
         Dama.ammo = 1
         Espada.destino = None
-        Espada.dano = 30
+        Espada.dano = 200
 
 
     if static_timer:
